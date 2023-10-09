@@ -38,7 +38,7 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
 
 }
 
-public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, whileConditionVariable: Double, whileConditionOperator: (Double, Double) -> Bool, whileConditionValue: Double, relativeTol: Double) -> SimulationDataContainer {
     
     var tempSystem = system
     
@@ -49,7 +49,7 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
     
     
     
-    while whileCondition {
+    while whileConditionOperator(whileConditionVariable, whileConditionValue) {
         
         let currentState = tempSystem.getCurrentState()
         
