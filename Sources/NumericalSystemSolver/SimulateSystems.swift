@@ -47,7 +47,7 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
     var outputData = SimulationDataContainer(data: [])
     outputData.storeSystemDataAtIteration(state: initialState)
     
-    let whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
+    var whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
     
     
     while whileCondition {
