@@ -8,7 +8,7 @@
 import Foundation
 
 
-func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
     
     var tempSystem = system
     
@@ -38,7 +38,7 @@ func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system:
 
 }
 
-func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
     
     var tempSystem = system
     
@@ -67,7 +67,7 @@ func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system:
 }
 
 
-func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
     
     var tempSystem = system
     
@@ -97,7 +97,7 @@ func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, 
 
 }
 
-func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
     
     var tempSystem = system
     
