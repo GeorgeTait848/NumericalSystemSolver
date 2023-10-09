@@ -60,7 +60,7 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
 
         outputData.storeSystemDataAtIteration(state: currentState)
         
-        let whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
+        whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
     }
     
     tempSystem.reassignProperties(newState: initialState)
