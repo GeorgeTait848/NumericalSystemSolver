@@ -50,7 +50,7 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
     var whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
     
     
-    while whileCondition {
+    while whileCondition == true {
         
         let currentState = tempSystem.getCurrentState()
         
