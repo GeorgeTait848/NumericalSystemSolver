@@ -65,7 +65,6 @@ public protocol System {
 
 public protocol TimeIndependantSimulatableSystem: System {
     func getCurrentDerivatives(currentState: DoubleVector, placeholder: Double) -> DoubleVector
-    mutating func updateSystemState(currentState: DoubleVector, step: Double)
    
 }
 
@@ -73,6 +72,5 @@ public protocol TimeIndependantSimulatableSystem: System {
 public protocol TimeDependantSimulatableSystem: System {
     
     func getCurrentDerivatives(currentState: DoubleVector, currentTime: Double) -> DoubleVector
-    mutating func updateSystemState(currentState: DoubleVector, currentTime: Double, step: Double)
    
 }

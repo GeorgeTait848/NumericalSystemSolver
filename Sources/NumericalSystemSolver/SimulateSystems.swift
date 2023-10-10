@@ -8,12 +8,14 @@
 import Foundation
 
 
-public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: inout T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
     
-    var tempSystem = system
+    
     
     var currentStep = 0.01
-    let initialState = tempSystem.getCurrentState()
+    let initialState = system.getCurrentState()
+    var currentState = initialState
+    
     var outputData = SimulationDataContainer(data: [])
     outputData.storeSystemDataAtIteration(state: initialState)
     
@@ -21,61 +23,60 @@ public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (
     
     while currentTime < timeOfSimulation {
         
-        let currentState = tempSystem.getCurrentState()
+        currentStep = adaptStep(f: system.getCurrentDerivatives(currentState:placeholder:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
+        updateSystemState(system: &system, step: currentStep)
         
-        currentStep = adaptStep(f: tempSystem.getCurrentDerivatives(currentState:placeholder:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
-        
-        tempSystem.updateSystemState(currentState: currentState, step: currentStep)
-
+        currentState = system.getCurrentState()
         outputData.storeSystemDataAtIteration(state: currentState)
         
         currentTime += currentStep
     }
     
-    tempSystem.reassignProperties(newState: initialState)
+    system.reassignProperties(newState: initialState)
     
     return outputData
 
 }
 
-public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: T, whileConditionVariable: Double, whileConditionOperator: (Double, Double) -> Bool, whileConditionValue: Double, relativeTol: Double) -> SimulationDataContainer {
-    
-    var tempSystem = system
+public func simulateTimeIndependantSystem<T: TimeIndependantSimulatableSystem> (system: inout T, breakConditionIndexInState: Int, breakConditionOperator: (Double, Double) -> Bool, breakConditionValue: Double, relativeTol: Double) -> SimulationDataContainer {
+
     
     var currentStep = 0.01
-    let initialState = tempSystem.getCurrentState()
+    let initialState = system.getCurrentState()
+    var currentState = initialState
+    
     var outputData = SimulationDataContainer(data: [])
-    outputData.storeSystemDataAtIteration(state: initialState)
+    outputData.storeSystemDataAtIteration(state: currentState)
     
-    var whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
+    var breakCondVariable = currentState.elements[breakConditionIndexInState]
     
     
-    while whileCondition == true {
+    while breakConditionOperator(breakCondVariable, breakConditionValue) {
         
-        let currentState = tempSystem.getCurrentState()
         
-        currentStep = adaptStep(f: tempSystem.getCurrentDerivatives(currentState:placeholder:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
+        currentStep = adaptStep(f: system.getCurrentDerivatives(currentState:placeholder:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
         
-        tempSystem.updateSystemState(currentState: currentState, step: currentStep)
-
+        updateSystemState(system: &system, step: currentStep)
+        
+        currentState = system.getCurrentState()
         outputData.storeSystemDataAtIteration(state: currentState)
-        
-        whileCondition = whileConditionOperator(whileConditionVariable, whileConditionValue)
+        breakCondVariable = currentState.elements[breakConditionIndexInState]
     }
     
-    tempSystem.reassignProperties(newState: initialState)
+    system.reassignProperties(newState: initialState)
     
     return outputData
 
 }
 
 
-public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
+public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: inout T, timeOfSimulation: Double, relativeTol: Double) -> SimulationDataContainer {
     
-    var tempSystem = system
     
     var currentStep = 0.01
-    let initialState = tempSystem.getCurrentState()
+    let initialState = system.getCurrentState()
+    var currentState = initialState
+    
     var outputData = SimulationDataContainer(data: [])
     outputData.storeSystemDataAtIteration(state: initialState)
     
@@ -83,49 +84,66 @@ public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (syst
     
     while currentTime < timeOfSimulation {
         
-        let currentState = tempSystem.getCurrentState()
+        currentStep = adaptStep(f: system.getCurrentDerivatives(currentState:currentTime:), y: currentState, x: currentTime, h: currentStep, relativeTol: relativeTol)
         
-        currentStep = adaptStep(f: tempSystem.getCurrentDerivatives(currentState:currentTime:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
+        updateSystemState(system: &system, currentTime: currentTime, step: currentStep)
         
-        tempSystem.updateSystemState(currentState: currentState, currentTime: currentTime, step: currentStep)
-
+        currentState = system.getCurrentState()
         outputData.storeSystemDataAtIteration(state: currentState)
         
         currentTime += currentStep
     }
     
-    tempSystem.reassignProperties(newState: initialState)
+    system.reassignProperties(newState: initialState)
     
     return outputData
 
 }
 
-public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: T, whileCondition: Bool, relativeTol: Double) -> SimulationDataContainer {
-    
-    var tempSystem = system
-    
+public func simulateTimeDependantSystem<T: TimeDependantSimulatableSystem> (system: inout T, breakConditionIndexInState: Int, breakConditionOperator: (Double, Double) -> Bool, breakConditionValue: Double, relativeTol: Double) -> SimulationDataContainer {
+
     var currentStep = 0.01
-    let initialState = tempSystem.getCurrentState()
+    var currentTime = 0.0
+    
+    let initialState = system.getCurrentState()
+    var currentState = initialState
+    
     var outputData = SimulationDataContainer(data: [])
     outputData.storeSystemDataAtIteration(state: initialState)
     
-    var currentTime = 0.0
-    
-    while whileCondition {
-        
-        let currentState = tempSystem.getCurrentState()
-        
-        currentStep = adaptStep(f: tempSystem.getCurrentDerivatives(currentState:currentTime:), y: currentState, x: 0, h: currentStep, relativeTol: relativeTol)
-        
-        tempSystem.updateSystemState(currentState: currentState, currentTime: currentTime, step: currentStep)
+    var breakConditionVariable = initialState.elements[breakConditionIndexInState]
 
+    while breakConditionOperator(breakConditionVariable, breakConditionValue) {
+
+        currentStep = adaptStep(f: system.getCurrentDerivatives(currentState:currentTime:), y: currentState, x: currentTime, h: currentStep, relativeTol: relativeTol)
+        updateSystemState(system: &system, currentTime: currentTime, step: currentStep)
+
+        currentState = system.getCurrentState()
         outputData.storeSystemDataAtIteration(state: currentState)
-        
         currentTime += currentStep
+        
+        breakConditionVariable = currentState.elements[breakConditionIndexInState]
     }
-    
-    tempSystem.reassignProperties(newState: initialState)
-    
+
+    system.reassignProperties(newState: initialState)
+
     return outputData
 
+}
+
+
+public func updateSystemState<T: TimeIndependantSimulatableSystem> (system: inout T, step: Double) {
+    
+    let newState = rungeKuttaFourthOrder(f: system.getCurrentDerivatives(currentState:placeholder:), y: system.getCurrentState(), x: 0, h: step)
+    
+    system.reassignProperties(newState: newState)
+    
+}
+
+public func updateSystemState<T: TimeDependantSimulatableSystem> (system: inout T, currentTime: Double, step: Double) {
+    
+    let newState = rungeKuttaFourthOrder(f: system.getCurrentDerivatives(currentState:currentTime:), y: system.getCurrentState(), x: currentTime, h: step)
+    
+    system.reassignProperties(newState: newState)
+    
 }
